@@ -3,9 +3,48 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+
+    <div ng-app="messages_app" ng-controller="messages_controller">
+        <form ng-submit="submit()">
+          Имя:<br>
+          <input ng-model="message_user" type="text">
+          <br>
+          Текст:<br>
+          <input ng-model="message_text" type="text">
+          <br><br>
+          <button type="submit">Отправить</button>
+        </form>
+    <div>
+        <div ng-repeat="message in messages">
+            <p>Пользователь: {{message.user}}, дата:  {{message.date | date : "medium"}}</p>
+            <p>Сообщение: {{message.text}}</p>
+        </div>
+    </div>
+    </div>
+
+    <script>
+    var app = angular.module('messages_app', []);
+    app.controller('messages_controller',function($scope, $http){
+        $http
+            .get("/get_all_posts")
+            .then(function(response){
+                $scope.messages = response.data.messages;
+            });
+        $scope.submit = function() {
+            $http
+                .post('/post_message', {text:$scope.message_text, user:$scope.message_user})
+                .success(function(data){
+                    console.log($scope.messages);
+                    $scope.messages.push({text:$scope.message_text, user:$scope.message_user, date:data.date});
+                })
+                .error(function(data){
+                    console.log('Error: ' + data);
+                });
+        };
+    });
+    </script>
   </body>
 </html>
