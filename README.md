@@ -5,3 +5,9 @@
 ```sh
 npm install
 ```
+
+Устанавливаем пакеты:
+
+```sh
+npm start
+```
